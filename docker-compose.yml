@@ -1,0 +1,20 @@
+services:
+  user_mongodb:
+    image: mongo:latest
+    container_name: user_mongodb
+    networks:
+      - user_network
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - "27018:27017"
+    volumes:
+      - user_mongodb_data:/data/db
+
+volumes:
+  user_mongodb_data:
+
+networks:
+  user_network:
+    external: true  
