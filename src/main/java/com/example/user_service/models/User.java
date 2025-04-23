@@ -3,12 +3,12 @@ package com.example.user_service.models;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collation = "users")
+@Document(collection = "users")
 public class User {
     @Id
     private String id;
 
-    private String userId;
+    private String userId; // esse id vai ser compartilhado com o auth-service.
     private String email;
     private String fullName;
     private String phone;
