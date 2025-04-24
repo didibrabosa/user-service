@@ -2,5 +2,7 @@ package com.example.user_service.dtos;
 
 public record UserRequest(
     String userId,
-    String email
+    String email,
+    String fullName,
+    String phone
 ) {}
