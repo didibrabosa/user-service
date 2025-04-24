@@ -1,6 +1,8 @@
 package com.example.user_service.services;
 
 import com.example.user_service.models.User;
+import com.example.user_service.dtos.UserRequest;
+import com.example.user_service.dtos.UserResponse;
 import com.example.user_service.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -13,27 +15,49 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User creatUser(String userId, String email) {
+    public UserResponse createUser(UserRequest request) {
         User user = new User();
-        user.setUserId(userId);
-        user.setEmail(email);
-        return userRepository.save(user);
+        user.setUserId(request.userId());
+        user.setEmail(request.email());
+        User savedUser = userRepository.save(user);
+        
+        return new UserResponse(
+        savedUser.getUserId(),
+        savedUser.getEmail(),
+        savedUser.getFullName(),
+        savedUser.getPhone()
+    );
     }
 
-    public User getUser(String userId) {
-        return userRepository.findByUserId(userId);
-    }
-
-    public User updateUser(String userId, String name, String phone) {
+    public UserResponse getUser(String userId) {
         User user = userRepository.findByUserId(userId);
         if (user == null) {
             throw new RuntimeException("User not found");
         }
+        return new UserResponse(
+            user.getUserId(), 
+            user.getEmail(),
+            user.getFullName(),
+            user.getPhone());
+    }
 
-        if (name != null) user.setFullName(name);
-        if (phone != null) user.setPhone(phone);
+    public UserResponse updateUser(UserRequest request) {
+        User user = userRepository.findByUserId(request.userId());
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
 
-        return userRepository.save(user);
+        if (request.email() != null) user.setEmail(request.email());
+        if (request.fullName() != null) user.setFullName(request.fullName());
+        if (request.phone() != null) user.setPhone(request.phone());
+
+        User updatedUser = userRepository.save(user);
+        return new UserResponse(
+            updatedUser.getUserId(),
+            updatedUser.getEmail(),
+            updatedUser.getFullName(),
+            updatedUser.getPhone()
+        );
     }
 
     public void deleteUser(String userId) {
