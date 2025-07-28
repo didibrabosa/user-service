@@ -4,6 +4,9 @@ import com.example.user_service.models.User;
 import com.example.user_service.dtos.UserRequest;
 import com.example.user_service.dtos.UserResponse;
 import com.example.user_service.repositories.UserRepository;
+import com.example.user_service.exceptions.UserAlreadyExistsException;
+import com.example.user_service.exceptions.UserNotFoundException;
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,6 +19,10 @@ public class UserService {
     }
 
     public UserResponse createUser(UserRequest request) {
+        if(userRepository.findByEmail(request.email()).isPresent()) {
+            throw new UserAlreadyExistsException("User with email '"+ request.email() +"' already exists.");
+        }
+        
         User user = new User();
         user.setUserId(request.userId());
         user.setEmail(request.email());
@@ -30,10 +37,8 @@ public class UserService {
     }
 
     public UserResponse getUser(String userId) {
-        User user = userRepository.findByUserId(userId);
-        if (user == null) {
-            throw new RuntimeException("User not found");
-        }
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
         return new UserResponse(
             user.getUserId(), 
             user.getEmail(),
@@ -41,11 +46,9 @@ public class UserService {
             user.getPhone());
     }
 
-    public UserResponse updateUser(UserRequest request) {
-        User user = userRepository.findByUserId(request.userId());
-        if (user == null) {
-            throw new RuntimeException("User not found");
-        }
+    public UserResponse updateUser(String userId, UserRequest request) {
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
 
         if (request.email() != null) user.setEmail(request.email());
         if (request.fullName() != null) user.setFullName(request.fullName());
@@ -61,6 +64,9 @@ public class UserService {
     }
 
     public void deleteUser(String userId) {
+        userRepository.findByUserId(userId)
+            .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
+
         userRepository.deleteByUserId(userId);
     }
 }
