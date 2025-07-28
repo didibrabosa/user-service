@@ -16,32 +16,33 @@ public class UserRouter {
         this.userService = userService;
     }
 
-    @PostMapping
+    @PostMapping()
     public ResponseEntity<UserResponse> createUser(
         @RequestBody UserRequest request
     ) {
         return ResponseEntity.ok(userService.createUser(request));
     }
 
-    @GetMapping
+    @GetMapping("/{userId}")
     public ResponseEntity<UserResponse> getUser(
-        @RequestBody UserRequest request
+        @PathVariable String userId
     ) {
-        return ResponseEntity.ok(userService.getUser(request.userId()));
+        return ResponseEntity.ok(userService.getUser(userId));
     }
 
-    @PatchMapping
+    @PatchMapping("/{userId}")
     public ResponseEntity<UserResponse> updateUser(
+        @PathVariable String userId,
         @RequestBody UserRequest request
     ) {
-        return ResponseEntity.ok(userService.updateUser(request));
+        return ResponseEntity.ok(userService.updateUser(userId, request));
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(
-        @RequestBody UserRequest request
+        @PathVariable String userId
     ) {
-        userService.deleteUser(request.userId());
+        userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
     }
 }
